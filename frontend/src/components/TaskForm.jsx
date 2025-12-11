@@ -1,4 +1,10 @@
 import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 const TaskForm = ({ projectId, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -11,7 +17,7 @@ const TaskForm = ({ projectId, onSubmit, onCancel }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title.trim()) {
-      alert('Task title is required');
+      toast.error('Task title is required');
       return;
     }
 
@@ -27,54 +33,66 @@ const TaskForm = ({ projectId, onSubmit, onCancel }) => {
         completed: false,
       });
     } catch (error) {
-      alert('Failed to create task');
+      toast.error('Failed to create task');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 rounded-lg shadow-md border border-gray-200 mb-4">
-      <h3 className="text-lg font-semibold mb-3 text-gray-800">Add New Task</h3>
-      <div className="space-y-3">
-        <input
-          type="text"
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          placeholder="Task title *"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <textarea
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          placeholder="Description (optional)"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          rows="3"
-        />
-        <input
-          type="date"
-          value={formData.dueDate}
-          onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <div className="flex gap-2">
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
-          >
-            Add Task
-          </button>
-          {onCancel && (
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium"
-            >
-              Cancel
-            </button>
-          )}
-        </div>
-      </div>
-    </form>
+    <Card className="mb-4">
+      <CardHeader>
+        <CardTitle>Add New Task</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="task-title">Task Title *</Label>
+            <Input
+              id="task-title"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder="Enter task title"
+              required
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="task-description">Description</Label>
+            <Textarea
+              id="task-description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Enter task description (optional)"
+              rows={3}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="task-dueDate">Due Date</Label>
+            <Input
+              id="task-dueDate"
+              type="date"
+              value={formData.dueDate}
+              onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+            />
+          </div>
+          
+          <div className="flex gap-2">
+            <Button type="submit">
+              Add Task
+            </Button>
+            {onCancel && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+              >
+                Cancel
+              </Button>
+            )}
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 

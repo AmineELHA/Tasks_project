@@ -1,12 +1,20 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { projectsAPI } from '../api';
 import Navbar from '../components/Navbar';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { FolderOpen, Plus, Trash2, AlertCircle, Eye } from "lucide-react";
+import { toast } from "sonner";
 
 const ProjectList = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProjects();
@@ -19,19 +27,19 @@ const ProjectList = () => {
       setError('');
     } catch (err) {
       setError('Failed to load projects');
+      toast.error("Failed to load projects");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
-      try {
-        await projectsAPI.delete(id);
-        setProjects(projects.filter(p => p.id !== id));
-      } catch (err) {
-        alert('Failed to delete project');
-      }
+  const handleDelete = async (id, title) => {
+    try {
+      await projectsAPI.delete(id);
+      setProjects(projects.filter(p => p.id !== id));
+      toast.success(`"${title}" deleted successfully`);
+    } catch (err) {
+      toast.error("Failed to delete project");
     }
   };
 
@@ -40,7 +48,15 @@ const ProjectList = () => {
       <>
         <Navbar />
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center">Loading...</div>
+          <div className="flex justify-between items-center mb-8">
+            <Skeleton className="h-10 w-48" />
+            <Skeleton className="h-10 w-40" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-48 w-full" />
+          </div>
         </div>
       </>
     );
@@ -51,61 +67,79 @@ const ProjectList = () => {
       <Navbar />
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">My Projects</h1>
-          <Link
-            to="/projects/new"
-            className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
-          >
+          <h1 className="text-3xl font-bold">My Projects</h1>
+          <Button onClick={() => navigate('/projects/new')}>
+            <Plus className="h-4 w-4 mr-2" />
             Create Project
-          </Link>
+          </Button>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md mb-4">
-            {error}
-          </div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
         {projects.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <p className="text-gray-500 text-lg mb-4">No projects yet</p>
-            <Link
-              to="/projects/new"
-              className="inline-block px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
-            >
-              Create Your First Project
-            </Link>
-          </div>
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center p-12">
+              <FolderOpen className="h-16 w-16 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No projects yet</h3>
+              <p className="text-muted-foreground text-center mb-4">
+                Get started by creating your first project
+              </p>
+              <Button onClick={() => navigate('/projects/new')}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Your First Project
+              </Button>
+            </CardContent>
+          </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project) => (
-              <div
-                key={project.id}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-              >
-                <h2 className="text-xl font-bold text-gray-800 mb-2">
-                  {project.title}
-                </h2>
-                {project.description && (
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {project.description}
-                  </p>
-                )}
-                <div className="flex gap-2 mt-4">
-                  <Link
-                    to={`/projects/${project.id}`}
-                    className="flex-1 text-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
+              <Card key={project.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="line-clamp-1">{project.title}</CardTitle>
+                  {project.description && (
+                    <CardDescription className="line-clamp-3">
+                      {project.description}
+                    </CardDescription>
+                  )}
+                </CardHeader>
+                <CardFooter className="flex gap-2">
+                  <Button 
+                    onClick={() => navigate(`/projects/${project.id}`)}
+                    className="flex-1"
                   >
+                    <Eye className="h-4 w-4 mr-2" />
                     View
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(project.id)}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+                  </Button>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="icon">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Project?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete "{project.title}" and all its tasks.
+                          This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete(project.id, project.title)}>
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </CardFooter>
+              </Card>
             ))}
           </div>
         )}

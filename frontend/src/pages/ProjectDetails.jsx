@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { projectsAPI, tasksAPI } from '../api';
 import Navbar from '../components/Navbar';
 import ProgressBar from '../components/ProgressBar';
 import TaskItem from '../components/TaskItem';
 import TaskForm from '../components/TaskForm';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { Skeleton } from '../components/ui/skeleton';
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -43,6 +49,7 @@ const ProjectDetails = () => {
       const newTask = await tasksAPI.create(taskData);
       setTasks([...tasks, newTask]);
       setShowTaskForm(false);
+      toast.success('Task created successfully');
       // Refresh progress
       const progressData = await projectsAPI.getProgress(id);
       setProgress(progressData);
@@ -80,7 +87,20 @@ const ProjectDetails = () => {
       <>
         <Navbar />
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center">Loading...</div>
+          <Skeleton className="h-10 w-48 mb-4" />
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-8 w-3/4 mb-2" />
+              <Skeleton className="h-4 w-full" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-6 w-full" />
+            </CardContent>
+          </Card>
+          <div className="mt-8">
+            <Skeleton className="h-8 w-32 mb-4" />
+            <Skeleton className="h-32 w-full" />
+          </div>
         </div>
       </>
     );
@@ -91,15 +111,15 @@ const ProjectDetails = () => {
       <>
         <Navbar />
         <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
-            {error || 'Project not found'}
-          </div>
-          <button
-            onClick={() => navigate('/projects')}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>
+              {error || 'Project not found'}
+            </AlertDescription>
+          </Alert>
+          <Button onClick={() => navigate('/projects')}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Projects
-          </button>
+          </Button>
         </div>
       </>
     );
@@ -109,38 +129,48 @@ const ProjectDetails = () => {
     <>
       <Navbar />
       <div className="container mx-auto px-4 py-8">
-        <button
+        <Button
+          variant="ghost"
           onClick={() => navigate('/projects')}
-          className="mb-4 text-blue-600 hover:text-blue-800 font-medium"
+          className="mb-4"
         >
-          ← Back to Projects
-        </button>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Projects
+        </Button>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">{project.title}</h1>
-          {project.description && (
-            <p className="text-gray-600 mb-4">{project.description}</p>
-          )}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-3xl">{project.title}</CardTitle>
+            {project.description && (
+              <CardDescription className="text-base">
+                {project.description}
+              </CardDescription>
+            )}
+          </CardHeader>
           {progress && (
-            <div className="mt-6">
+            <CardContent>
               <ProgressBar
                 totalTasks={progress.totalTasks}
                 completedTasks={progress.completedTasks}
                 progressPercentage={progress.progressPercentage}
               />
-            </div>
+            </CardContent>
           )}
-        </div>
+        </Card>
 
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-800">Tasks</h2>
-            <button
-              onClick={() => setShowTaskForm(!showTaskForm)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
-            >
-              {showTaskForm ? 'Cancel' : 'Add Task'}
-            </button>
+            <h2 className="text-2xl font-bold">Tasks</h2>
+            <Button onClick={() => setShowTaskForm(!showTaskForm)}>
+              {showTaskForm ? (
+                'Cancel'
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Task
+                </>
+              )}
+            </Button>
           </div>
 
           {showTaskForm && (
@@ -154,15 +184,15 @@ const ProjectDetails = () => {
 
         <div className="space-y-4">
           {tasks.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-md p-12 text-center">
-              <p className="text-gray-500 text-lg mb-4">No tasks yet</p>
-              <button
-                onClick={() => setShowTaskForm(true)}
-                className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
-              >
-                Add Your First Task
-              </button>
-            </div>
+            <Card className="text-center py-12">
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground text-lg">No tasks yet</p>
+                <Button onClick={() => setShowTaskForm(true)} size="lg">
+                  <Plus className="mr-2 h-5 w-5" />
+                  Add Your First Task
+                </Button>
+              </CardContent>
+            </Card>
           ) : (
             tasks.map((task) => (
               <TaskItem

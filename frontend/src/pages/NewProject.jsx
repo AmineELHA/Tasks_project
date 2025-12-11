@@ -2,6 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { projectsAPI } from '../api';
 import Navbar from '../components/Navbar';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 const NewProject = () => {
   const [formData, setFormData] = useState({
@@ -24,9 +32,11 @@ const NewProject = () => {
 
     try {
       await projectsAPI.create(formData);
+      toast.success("Project created successfully!");
       navigate('/projects');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create project');
+      toast.error("Failed to create project");
     } finally {
       setLoading(false);
     }
@@ -37,63 +47,72 @@ const NewProject = () => {
       <Navbar />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-800 mb-8">Create New Project</h1>
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/projects')}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Projects
+          </Button>
           
-          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md mb-4">
-                {error}
-              </div>
-            )}
+          <Card>
+            <CardHeader>
+              <CardTitle>Create New Project</CardTitle>
+              <CardDescription>
+                Add a new project to organize your tasks
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
 
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                  Project Title *
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter project title"
-                  required
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="title">Project Title *</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Enter project title"
+                    required
+                  />
+                </div>
 
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter project description (optional)"
-                  rows="4"
-                />
-              </div>
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Enter project description (optional)"
+                    rows={4}
+                  />
+                </div>
 
-            <div className="flex gap-3 mt-6">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium disabled:bg-blue-300"
-              >
-                {loading ? 'Creating...' : 'Create Project'}
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/projects')}
-                className="px-6 py-3 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1"
+                  >
+                    {loading ? 'Creating...' : 'Create Project'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate('/projects')}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </>

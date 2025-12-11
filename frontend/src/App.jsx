@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import ProjectList from './pages/ProjectList';
 import ProjectDetails from './pages/ProjectDetails';
 import NewProject from './pages/NewProject';
+import { Toaster } from "@/components/ui/sonner";
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -78,6 +79,7 @@ function App() {
     <Router>
       <AuthProvider>
         <AppRoutes />
+        <Toaster />
       </AuthProvider>
     </Router>
   );

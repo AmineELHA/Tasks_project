@@ -1,20 +1,27 @@
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+
 const ProgressBar = ({ totalTasks, completedTasks, progressPercentage }) => {
   return (
-    <div className="w-full">
-      <div className="flex justify-between text-sm text-gray-600 mb-2">
-        <span>Progress</span>
-        <span>{completedTasks} / {totalTasks} tasks completed</span>
-      </div>
-      <div className="w-full bg-gray-200 rounded-full h-4">
-        <div
-          className="bg-blue-600 h-4 rounded-full transition-all duration-300"
-          style={{ width: `${progressPercentage}%` }}
+    <div className="space-y-2">
+      <div className="flex justify-between items-center">
+        <span className="text-sm font-medium">Progress</span>
+        <Badge 
+          variant={progressPercentage === 100 ? "default" : "secondary"}
+          className="tabular-nums"
         >
-          <span className="text-xs text-white flex items-center justify-center h-full font-semibold">
-            {progressPercentage > 10 && `${Math.round(progressPercentage)}%`}
-          </span>
-        </div>
+          {completedTasks} / {totalTasks}
+        </Badge>
       </div>
+      
+      <Progress 
+        value={progressPercentage} 
+        className="h-2"
+      />
+      
+      <p className="text-xs text-muted-foreground text-right tabular-nums">
+        {Math.round(progressPercentage)}% complete
+      </p>
     </div>
   );
 };
