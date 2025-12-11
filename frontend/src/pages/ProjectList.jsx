@@ -65,12 +65,12 @@ const ProjectList = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">My Projects</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
           <Button onClick={() => navigate('/projects/new')}>
             <Plus className="h-4 w-4 mr-2" />
-            Create Project
+            New Project
           </Button>
         </div>
 
@@ -82,27 +82,27 @@ const ProjectList = () => {
         )}
 
         {projects.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center p-12">
-              <FolderOpen className="h-16 w-16 text-muted-foreground mb-4" />
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <FolderOpen className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No projects yet</h3>
-              <p className="text-muted-foreground text-center mb-4">
+              <p className="text-sm text-muted-foreground text-center mb-6 max-w-sm">
                 Get started by creating your first project
               </p>
               <Button onClick={() => navigate('/projects/new')}>
                 <Plus className="h-4 w-4 mr-2" />
-                Create Your First Project
+                Create Project
               </Button>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {projects.map((project) => (
-              <Card key={project.id} className="hover:shadow-lg transition-shadow">
+              <Card key={project.id} className="hover:border-foreground/20 transition-colors">
                 <CardHeader>
-                  <CardTitle className="line-clamp-1">{project.title}</CardTitle>
+                  <CardTitle className="line-clamp-1 text-xl">{project.title}</CardTitle>
                   {project.description && (
-                    <CardDescription className="line-clamp-3">
+                    <CardDescription className="line-clamp-2 text-sm">
                       {project.description}
                     </CardDescription>
                   )}
@@ -111,20 +111,21 @@ const ProjectList = () => {
                   <Button 
                     onClick={() => navigate(`/projects/${project.id}`)}
                     className="flex-1"
+                    variant="outline"
                   >
                     <Eye className="h-4 w-4 mr-2" />
-                    View
+                    Open
                   </Button>
                   
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="icon">
+                      <Button variant="ghost" size="icon">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Project?</AlertDialogTitle>
+                        <AlertDialogTitle>Delete project?</AlertDialogTitle>
                         <AlertDialogDescription>
                           This will permanently delete "{project.title}" and all its tasks.
                           This action cannot be undone.

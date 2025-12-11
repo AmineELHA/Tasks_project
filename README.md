@@ -1,273 +1,294 @@
-# Task Manager API - Spring Boot 3
+# Task Manager - Full Stack Application
 
-A RESTful API for managing tasks and projects with JWT authentication.
+A modern, full-stack task management application built with Spring Boot and React. Manage projects, track tasks, and monitor progress with an intuitive interface.
 
-## Features
+![Tech Stack](https://img.shields.io/badge/Spring%20Boot-3.2.0-green)
+![React](https://img.shields.io/badge/React-18-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12+-blue)
+![JWT](https://img.shields.io/badge/Auth-JWT-orange)
 
-- JWT-based authentication
-- User management with BCrypt password hashing
-- Project CRUD operations
-- Task CRUD operations with project association
-- Project progress tracking
-- Global exception handling
-- Input validation
+## 🚀 Features
 
-## Tech Stack
+- **Authentication** - Secure JWT-based authentication system
+- **Project Management** - Create, edit, and organize projects
+- **Task Management** - Add tasks with titles, descriptions, and due dates
+- **Progress Tracking** - Real-time progress visualization
+- **Responsive UI** - Modern, clean interface with Tailwind CSS & shadcn/ui
+- **RESTful API** - Well-documented backend API
 
-- Spring Boot 3.2.0
-- Spring Security
-- Spring Data JPA
-- PostgreSQL
-- JWT (jjwt 0.12.3)
-- Lombok
-- Maven
+## 🛠️ Tech Stack
 
-## Project Structure
+### Backend
+- **Spring Boot 3.2.0** - Java framework
+- **Spring Security** - Authentication & authorization
+- **Spring Data JPA** - Data persistence
+- **PostgreSQL** - Database
+- **JWT (jjwt 0.12.3)** - Token-based authentication
+- **Maven** - Dependency management
 
-```
-src/main/java/com/taskmanager/
-├── controllers/        # REST controllers
-├── services/          # Business logic
-├── repositories/      # Data access layer
-├── models/            # Entity classes
-├── dtos/              # Data transfer objects
-├── security/          # Security configuration & JWT
-└── exception/         # Global exception handler
-```
+### Frontend
+- **React 18** - UI library
+- **Vite** - Build tool
+- **React Router v6** - Client-side routing
+- **Axios** - HTTP client
+- **Tailwind CSS** - Styling
+- **shadcn/ui** - UI components
+- **Lucide React** - Icons
 
-## Prerequisites
+## 📋 Prerequisites
 
-- **Java 17** (required - Lombok compatibility)
-- Maven 3.6+
-- PostgreSQL 12+
+- **Java 17** (required for backend)
+- **Node.js 16+** (required for frontend)
+- **PostgreSQL 12+** (database)
+- **Maven 3.6+** (backend build tool)
+- **npm or yarn** (frontend package manager)
 
-**Important:** This project must be built with Java 17 due to Lombok compatibility. If you have multiple Java versions installed, use the provided `run.sh` script or set JAVA_HOME:
+## 🚦 Quick Start
+
+### Option 1: Manual Setup
+
+#### 1. Database Setup
+
+Create a PostgreSQL database:
 
 ```bash
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
-```
+# Login to PostgreSQL
+psql -U postgres
 
-## Database Setup
-
-1. Create a PostgreSQL database:
-```sql
+# Create database
 CREATE DATABASE taskmanager;
+\q
 ```
 
-2. Update database credentials in `src/main/resources/application.properties`:
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/taskmanager
-spring.datasource.username=your_username
-spring.datasource.password=your_password
-```
+#### 2. Backend Setup
 
-## Running the Application
-
-### Option 1: Using the provided script (Recommended)
 ```bash
+# Navigate to project root
+cd Tasks_project
+
+# Update database credentials in src/main/resources/application.properties
+# spring.datasource.username=your_username
+# spring.datasource.password=your_password
+
+# Build and run (requires Java 17)
 ./run.sh
-```
 
-### Option 2: Manual setup
-
-1. Set Java 17 (if you have multiple Java versions):
-```bash
+# OR manually:
 export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
-export PATH=$JAVA_HOME/bin:$PATH
-```
-
-2. Install dependencies:
-```bash
 mvn clean install
-```
-
-3. Run the application:
-```bash
 mvn spring-boot:run
 ```
 
-The application will start on `http://localhost:8080`
+Backend will start at: `http://localhost:8080`
 
-## Default User
+#### 3. Frontend Setup
 
-A default user is created automatically:
-- Email: `admin@demo.com`
-- Password: `123456`
+```bash
+# Navigate to frontend directory
+cd frontend
 
-## API Endpoints
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+Frontend will start at: `http://localhost:3000`
+
+### Option 2: Docker Setup (Recommended)
+
+```bash
+# Build and start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+- Frontend: `http://localhost:3000`
+- Backend API: `http://localhost:8080`
+- Database: `localhost:5432`
+
+## 🔑 Default Credentials
+
+```
+Email: admin@demo.com
+Password: 123456
+```
+
+## 📁 Project Structure
+
+```
+Tasks_project/
+├── src/                          # Backend source code
+│   └── main/
+│       ├── java/com/taskmanager/
+│       │   ├── controllers/      # REST controllers
+│       │   ├── services/         # Business logic
+│       │   ├── repositories/     # Data access layer
+│       │   ├── models/           # Entity classes
+│       │   ├── dtos/             # Data transfer objects
+│       │   ├── security/         # Security & JWT config
+│       │   └── exception/        # Global exception handler
+│       └── resources/
+│           ├── application.properties
+│           └── data.sql          # Initial data
+├── frontend/                     # Frontend source code
+│   ├── src/
+│   │   ├── api/                  # API service layer
+│   │   ├── components/           # Reusable components
+│   │   │   ├── ui/               # shadcn/ui components
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── ProgressBar.jsx
+│   │   │   ├── TaskForm.jsx
+│   │   │   └── TaskItem.jsx
+│   │   ├── context/              # React context providers
+│   │   ├── pages/                # Page components
+│   │   │   ├── Login.jsx
+│   │   │   ├── ProjectList.jsx
+│   │   │   ├── ProjectDetails.jsx
+│   │   │   └── NewProject.jsx
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   └── package.json
+├── docker-compose.yml            # Docker configuration
+├── README.md                     # This file
+├── BACKEND_README.md             # Detailed backend docs
+└── pom.xml                       # Maven configuration
+```
+
+## 📚 Documentation
+
+- **[Backend Documentation](BACKEND_README.md)** - Complete API documentation, endpoints, security details
+- **[Frontend Documentation](frontend/README.md)** - Frontend architecture, components, routing
+
+## 🔗 API Endpoints
 
 ### Authentication
-
-#### Login
-```http
-POST /auth/login
-Content-Type: application/json
-
-{
-  "email": "admin@demo.com",
-  "password": "123456"
-}
-
-Response:
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "email": "admin@demo.com"
-}
-```
+- `POST /auth/login` - User login (public)
 
 ### Projects
-
-All project endpoints require JWT token in Authorization header:
-```
-Authorization: Bearer <your-token>
-```
-
-#### Get All Projects
-```http
-GET /projects
-```
-
-#### Get Project by ID
-```http
-GET /projects/{id}
-```
-
-#### Create Project
-```http
-POST /projects
-Content-Type: application/json
-
-{
-  "title": "My Project",
-  "description": "Project description"
-}
-```
-
-#### Update Project
-```http
-PUT /projects/{id}
-Content-Type: application/json
-
-{
-  "title": "Updated Project",
-  "description": "Updated description"
-}
-```
-
-#### Delete Project
-```http
-DELETE /projects/{id}
-```
-
-#### Get Project Progress
-```http
-GET /projects/{id}/progress
-
-Response:
-{
-  "totalTasks": 10,
-  "completedTasks": 7,
-  "progressPercentage": 70.0
-}
-```
+- `GET /projects` - List all projects
+- `POST /projects` - Create project
+- `GET /projects/{id}` - Get project by ID
+- `PUT /projects/{id}` - Update project
+- `DELETE /projects/{id}` - Delete project
+- `GET /projects/{id}/progress` - Get project progress
 
 ### Tasks
+- `GET /tasks?projectId={id}` - Get tasks by project
+- `POST /tasks` - Create task
+- `GET /tasks/{id}` - Get task by ID
+- `PUT /tasks/{id}` - Update task
+- `DELETE /tasks/{id}` - Delete task
 
-#### Get Tasks by Project
-```http
-GET /tasks?projectId={projectId}
+All endpoints except `/auth/login` require JWT authentication via `Authorization: Bearer <token>` header.
+
+See [BACKEND_README.md](BACKEND_README.md) for detailed API documentation with request/response examples.
+
+## 🎨 Screenshots
+
+### Login Page
+Clean authentication with demo credentials displayed.
+
+### Projects Dashboard
+Grid view of all projects with progress indicators and actions.
+
+### Project Details
+Detailed view with task list, progress tracking, and task management.
+
+### Task Management
+Create, edit, complete, and delete tasks with due dates.
+
+## 🔒 Security
+
+- **JWT Authentication** - Tokens expire after 24 hours
+- **BCrypt Password Hashing** - Secure password storage
+- **CORS Configuration** - Frontend-backend communication
+- **Input Validation** - Server-side validation on all inputs
+- **Authorization** - Users can only access their own data
+
+## 🧪 Testing
+
+### Backend
+```bash
+mvn test
 ```
 
-#### Get Task by ID
-```http
-GET /tasks/{id}
+### Frontend
+```bash
+cd frontend
+npm run test
 ```
 
-#### Create Task
-```http
-POST /tasks
-Content-Type: application/json
+## 🏗️ Building for Production
 
-{
-  "title": "Task title",
-  "description": "Task description",
-  "dueDate": "2025-12-31",
-  "completed": false,
-  "projectId": 1
-}
-```
-
-#### Update Task
-```http
-PUT /tasks/{id}
-Content-Type: application/json
-
-{
-  "title": "Updated task",
-  "description": "Updated description",
-  "dueDate": "2025-12-31",
-  "completed": true,
-  "projectId": 1
-}
-```
-
-#### Delete Task
-```http
-DELETE /tasks/{id}
-```
-
-## Security
-
-- JWT tokens expire after 24 hours (configurable in application.properties)
-- Only `/auth/login` endpoint is public
-- All other endpoints require valid JWT token
-- Users can only access their own projects and tasks
-
-## Configuration
-
-Key configuration properties in `application.properties`:
-
-```properties
-# JWT Secret (should be at least 256 bits for HS256)
-jwt.secret=yourSecretKeyMustBeAtLeast256BitsLongForHS256AlgorithmToWorkProperly
-
-# JWT Expiration (in milliseconds, default: 24 hours)
-jwt.expiration=86400000
-
-# Database URL
-spring.datasource.url=jdbc:postgresql://localhost:5432/taskmanager
-```
-
-## Error Handling
-
-The API returns consistent error responses:
-
-```json
-{
-  "message": "Error description",
-  "status": 400
-}
-```
-
-Validation errors return field-specific messages:
-
-```json
-{
-  "email": "Email is required",
-  "password": "Password is required"
-}
-```
-
-## Building for Production
-
+### Backend
 ```bash
 mvn clean package
 java -jar target/task-manager-1.0.0.jar
 ```
 
-## Notes
+### Frontend
+```bash
+cd frontend
+npm run build
+npm run preview
+```
 
-- The application uses BCrypt for password hashing
-- Database schema is created automatically via JPA
-- Initial user data is loaded from `data.sql`
-- CORS is not configured by default (add if needed for frontend)
+## 🐳 Docker Commands
+
+```bash
+# Build images
+docker-compose build
+
+# Start services
+docker-compose up -d
+
+# Stop services
+docker-compose down
+
+# View logs
+docker-compose logs -f [service-name]
+
+# Rebuild and restart
+docker-compose up -d --build
+
+# Remove volumes (reset database)
+docker-compose down -v
+```
+
+## 🤝 Contributing
+
+This is an internship technical test project. For any issues or improvements:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is created as part of a technical assessment.
+
+## 👤 Author
+
+**Amine EL HARCHAOUI**
+- GitHub: [@AmineELHA](https://github.com/AmineELHA)
+- Repository: [Tasks_project](https://github.com/AmineELHA/Tasks_project)
+
+## 🙏 Acknowledgments
+
+- Spring Boot Documentation
+- React Documentation
+- shadcn/ui Component Library
+- Tailwind CSS
+
+---
+
+**Made with ❤️ as part of a Full Stack Developer Internship Technical Assessment**

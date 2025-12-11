@@ -7,20 +7,19 @@ const Navbar = () => {
   const { user, logout } = useAuth();
 
   return (
-    <nav className="bg-blue-600 text-white shadow-lg">
+    <nav className="border-b bg-background">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <Link to="/projects" className="text-2xl font-bold hover:opacity-90 transition-opacity">
+          <Link to="/projects" className="text-xl font-semibold hover:opacity-80 transition-opacity">
             Task Manager
           </Link>
           {user && (
             <div className="flex items-center gap-4">
-              <span className="text-sm">{user.email}</span>
+              <span className="text-sm text-muted-foreground">{user.email}</span>
               <Button
                 onClick={logout}
                 size="sm"
-                variant="secondary"
-                className="bg-blue-700 hover:bg-blue-800 text-white"
+                variant="ghost"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout

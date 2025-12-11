@@ -38,19 +38,16 @@ const TaskForm = ({ projectId, onSubmit, onCancel }) => {
   };
 
   return (
-    <Card className="mb-4">
-      <CardHeader>
-        <CardTitle>Add New Task</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <Card>
+      <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="task-title">Task Title *</Label>
+            <Label htmlFor="task-title">Title</Label>
             <Input
               id="task-title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Enter task title"
+              placeholder="Task title"
               required
             />
           </div>
@@ -61,7 +58,7 @@ const TaskForm = ({ projectId, onSubmit, onCancel }) => {
               id="task-description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Enter task description (optional)"
+              placeholder="Add details (optional)"
               rows={3}
             />
           </div>
@@ -76,8 +73,8 @@ const TaskForm = ({ projectId, onSubmit, onCancel }) => {
             />
           </div>
           
-          <div className="flex gap-2">
-            <Button type="submit">
+          <div className="flex gap-2 pt-2">
+            <Button type="submit" className="flex-1">
               Add Task
             </Button>
             {onCancel && (

@@ -32,10 +32,10 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h2 className="text-4xl font-extrabold text-gray-900">
+          <h2 className="text-3xl font-bold tracking-tight">
             Task Manager
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -43,11 +43,11 @@ const Login = () => {
           </p>
         </div>
         
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome back</CardTitle>
+        <Card className="border-border">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl">Welcome back</CardTitle>
             <CardDescription>
-              Enter your credentials to access your account
+              Enter your credentials to continue
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -60,7 +60,7 @@ const Login = () => {
               )}
               
               <div className="space-y-2">
-                <Label htmlFor="email">Email address</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   name="email"
@@ -88,14 +88,14 @@ const Login = () => {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full"
+                className="w-full mt-6"
               >
                 {loading ? 'Signing in...' : 'Sign in'}
               </Button>
               
-              <div className="text-center text-sm text-muted-foreground pt-4 border-t">
-                <p>Default credentials:</p>
-                <p className="font-mono text-xs mt-1">admin@demo.com / 123456</p>
+              <div className="text-center text-xs text-muted-foreground pt-4 border-t">
+                <p className="mb-1">Demo credentials:</p>
+                <p className="font-mono">admin@demo.com / 123456</p>
               </div>
             </form>
           </CardContent>

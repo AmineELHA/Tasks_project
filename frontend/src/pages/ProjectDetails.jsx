@@ -128,21 +128,21 @@ const ProjectDetails = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
         <Button
           variant="ghost"
           onClick={() => navigate('/projects')}
-          className="mb-4"
+          className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Projects
+          Back
         </Button>
 
-        <Card className="mb-6">
+        <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-3xl">{project.title}</CardTitle>
+            <CardTitle className="text-3xl tracking-tight">{project.title}</CardTitle>
             {project.description && (
-              <CardDescription className="text-base">
+              <CardDescription className="text-base mt-2">
                 {project.description}
               </CardDescription>
             )}
@@ -159,9 +159,9 @@ const ProjectDetails = () => {
         </Card>
 
         <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Tasks</h2>
-            <Button onClick={() => setShowTaskForm(!showTaskForm)}>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold">Tasks</h2>
+            <Button onClick={() => setShowTaskForm(!showTaskForm)} variant={showTaskForm ? "outline" : "default"}>
               {showTaskForm ? (
                 'Cancel'
               ) : (
@@ -174,22 +174,24 @@ const ProjectDetails = () => {
           </div>
 
           {showTaskForm && (
-            <TaskForm
-              projectId={parseInt(id)}
-              onSubmit={handleCreateTask}
-              onCancel={() => setShowTaskForm(false)}
-            />
+            <div className="mb-6">
+              <TaskForm
+                projectId={parseInt(id)}
+                onSubmit={handleCreateTask}
+                onCancel={() => setShowTaskForm(false)}
+              />
+            </div>
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {tasks.length === 0 ? (
-            <Card className="text-center py-12">
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground text-lg">No tasks yet</p>
-                <Button onClick={() => setShowTaskForm(true)} size="lg">
-                  <Plus className="mr-2 h-5 w-5" />
-                  Add Your First Task
+            <Card className="border-dashed">
+              <CardContent className="flex flex-col items-center py-16">
+                <p className="text-sm text-muted-foreground mb-4">No tasks yet</p>
+                <Button onClick={() => setShowTaskForm(true)} variant="outline">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Task
                 </Button>
               </CardContent>
             </Card>

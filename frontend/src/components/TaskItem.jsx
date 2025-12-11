@@ -114,25 +114,25 @@ const TaskItem = ({ task, onUpdate, onDelete }) => {
     const dueDate = new Date(task.dueDate);
     if (isPast(dueDate) && !isToday(dueDate)) return "destructive";
     if (isToday(dueDate)) return "default";
-    return "secondary";
+    return "outline";
   };
 
   return (
     <Card className={cn(
-      "transition-all",
-      task.completed && "opacity-60 bg-muted/50"
+      "transition-colors",
+      task.completed && "opacity-50"
     )}>
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <Checkbox
             checked={task.completed}
             onCheckedChange={handleToggleComplete}
-            className="mt-1"
+            className="mt-0.5"
           />
           
-          <div className="flex-1 space-y-1">
+          <div className="flex-1 min-w-0">
             <h3 className={cn(
-              "text-lg font-semibold",
+              "text-base font-medium",
               task.completed && "line-through text-muted-foreground"
             )}>
               {task.title}
@@ -140,8 +140,8 @@ const TaskItem = ({ task, onUpdate, onDelete }) => {
             
             {task.description && (
               <p className={cn(
-                "text-sm",
-                task.completed ? "text-muted-foreground" : "text-foreground"
+                "text-sm mt-1",
+                task.completed ? "text-muted-foreground" : "text-muted-foreground"
               )}>
                 {task.description}
               </p>
@@ -158,10 +158,11 @@ const TaskItem = ({ task, onUpdate, onDelete }) => {
             )}
           </div>
           
-          <div className="flex gap-1">
+          <div className="flex gap-1 ml-2">
             <Button
               variant="ghost"
               size="icon"
+              className="h-8 w-8"
               onClick={() => setIsEditing(true)}
             >
               <Pencil className="h-4 w-4" />
@@ -169,16 +170,15 @@ const TaskItem = ({ task, onUpdate, onDelete }) => {
             
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Trash2 className="h-4 w-4 text-destructive" />
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Task?</AlertDialogTitle>
+                  <AlertDialogTitle>Delete task?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete "{task.title}".
-                    This action cannot be undone.
+                    This will permanently delete "{task.title}". This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
