@@ -10,7 +10,7 @@ const Navbar = () => {
     <nav className="border-b bg-background">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <Link to="/projects" className="text-xl font-semibold hover:opacity-80 transition-opacity">
+          <Link to="/" className="text-xl font-semibold hover:opacity-80 transition-opacity">
             Task Manager
           </Link>
           {user && (

@@ -1,5 +1,7 @@
 package com.taskmanager.controllers;
 
+import com.taskmanager.dtos.PageResponse;
+import com.taskmanager.dtos.TaskFilterRequest;
 import com.taskmanager.dtos.TaskRequest;
 import com.taskmanager.dtos.TaskResponse;
 import com.taskmanager.services.TaskService;
@@ -21,6 +23,24 @@ public class TaskController {
     @GetMapping
     public ResponseEntity<List<TaskResponse>> getTasksByProjectId(@RequestParam Long projectId) {
         List<TaskResponse> tasks = taskService.getTasksByProjectId(projectId);
+        return ResponseEntity.ok(tasks);
+    }
+    
+    @GetMapping("/filter")
+    public ResponseEntity<PageResponse<TaskResponse>> getTasksWithFilters(
+            @RequestParam Long projectId,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Boolean completed,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        
+        TaskFilterRequest filterRequest = new TaskFilterRequest(
+                projectId, search, completed, sortBy, sortDirection, page, size
+        );
+        
+        PageResponse<TaskResponse> tasks = taskService.getTasksWithFilters(filterRequest);
         return ResponseEntity.ok(tasks);
     }
     

@@ -1,5 +1,6 @@
 package com.taskmanager.controllers;
 
+import com.taskmanager.dtos.PageResponse;
 import com.taskmanager.dtos.ProjectRequest;
 import com.taskmanager.dtos.ProjectResponse;
 import com.taskmanager.dtos.ProgressResponse;
@@ -22,6 +23,16 @@ public class ProjectController {
     @GetMapping
     public ResponseEntity<List<ProjectResponse>> getAllProjects() {
         List<ProjectResponse> projects = projectService.getAllProjects();
+        return ResponseEntity.ok(projects);
+    }
+    
+    @GetMapping("/paginated")
+    public ResponseEntity<PageResponse<ProjectResponse>> getProjectsPaginated(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        PageResponse<ProjectResponse> projects = projectService.getProjectsWithPagination(page, size, sortBy, sortDirection);
         return ResponseEntity.ok(projects);
     }
     

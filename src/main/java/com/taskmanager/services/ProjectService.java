@@ -1,5 +1,6 @@
 package com.taskmanager.services;
 
+import com.taskmanager.dtos.PageResponse;
 import com.taskmanager.dtos.ProjectRequest;
 import com.taskmanager.dtos.ProjectResponse;
 import com.taskmanager.dtos.ProgressResponse;
@@ -9,6 +10,10 @@ import com.taskmanager.models.User;
 import com.taskmanager.repositories.ProjectRepository;
 import com.taskmanager.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +42,31 @@ public class ProjectService {
         return projects.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
+    }
+    
+    public PageResponse<ProjectResponse> getProjectsWithPagination(int page, int size, String sortBy, String sortDirection) {
+        User currentUser = getCurrentUser();
+        
+        Sort sort = sortDirection.equalsIgnoreCase("desc") 
+                ? Sort.by(sortBy).descending() 
+                : Sort.by(sortBy).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Project> projectPage = projectRepository.findByUserId(currentUser.getId(), pageable);
+        
+        List<ProjectResponse> content = projectPage.getContent().stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+        
+        return new PageResponse<>(
+                content,
+                projectPage.getNumber(),
+                projectPage.getSize(),
+                projectPage.getTotalElements(),
+                projectPage.getTotalPages(),
+                projectPage.isFirst(),
+                projectPage.isLast()
+        );
     }
     
     public ProjectResponse getProjectById(Long id) {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { projectsAPI } from '../api';
 import Navbar from '../components/Navbar';
+import Pagination from '../components/Pagination';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -14,16 +15,26 @@ const ProjectList = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [pagination, setPagination] = useState({
+    pageNumber: 0,
+    pageSize: 9,
+    totalElements: 0,
+    totalPages: 0,
+    first: true,
+    last: true
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    fetchProjects(pagination.pageNumber);
+  }, [pagination.pageNumber]);
 
-  const fetchProjects = async () => {
+  const fetchProjects = async (page = 0) => {
     try {
-      const data = await projectsAPI.getAll();
-      setProjects(data);
+      setLoading(true);
+      const data = await projectsAPI.getPaginated(page, 9, 'id', 'desc');
+      setProjects(data.content);
+      setPagination(data);
       setError('');
     } catch (err) {
       setError('Failed to load projects');
@@ -33,11 +44,16 @@ const ProjectList = () => {
     }
   };
 
+  const handlePageChange = (newPage) => {
+    setPagination(prev => ({ ...prev, pageNumber: newPage }));
+  };
+
   const handleDelete = async (id, title) => {
     try {
       await projectsAPI.delete(id);
-      setProjects(projects.filter(p => p.id !== id));
       toast.success(`"${title}" deleted successfully`);
+      // Refresh the current page
+      fetchProjects(pagination.pageNumber);
     } catch (err) {
       toast.error("Failed to delete project");
     }
@@ -143,6 +159,16 @@ const ProjectList = () => {
               </Card>
             ))}
           </div>
+        )}
+        
+        {!loading && projects.length > 0 && pagination.totalPages > 1 && (
+          <Pagination
+            pageNumber={pagination.pageNumber}
+            totalPages={pagination.totalPages}
+            onPageChange={handlePageChange}
+            isFirst={pagination.first}
+            isLast={pagination.last}
+          />
         )}
       </div>
     </>

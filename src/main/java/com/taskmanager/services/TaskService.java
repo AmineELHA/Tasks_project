@@ -1,5 +1,7 @@
 package com.taskmanager.services;
 
+import com.taskmanager.dtos.PageResponse;
+import com.taskmanager.dtos.TaskFilterRequest;
 import com.taskmanager.dtos.TaskRequest;
 import com.taskmanager.dtos.TaskResponse;
 import com.taskmanager.models.Project;
@@ -9,6 +11,10 @@ import com.taskmanager.repositories.ProjectRepository;
 import com.taskmanager.repositories.TaskRepository;
 import com.taskmanager.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +52,43 @@ public class TaskService {
         return tasks.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
+    }
+    
+    public PageResponse<TaskResponse> getTasksWithFilters(TaskFilterRequest filterRequest) {
+        User currentUser = getCurrentUser();
+        Project project = projectRepository.findById(filterRequest.getProjectId())
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        
+        if (!project.getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Unauthorized access to project");
+        }
+        
+        Sort sort = filterRequest.getSortDirection().equalsIgnoreCase("desc")
+                ? Sort.by(filterRequest.getSortBy()).descending()
+                : Sort.by(filterRequest.getSortBy()).ascending();
+        
+        Pageable pageable = PageRequest.of(filterRequest.getPage(), filterRequest.getSize(), sort);
+        
+        Page<Task> taskPage = taskRepository.findByFilters(
+                filterRequest.getProjectId(),
+                filterRequest.getSearch(),
+                filterRequest.getCompleted(),
+                pageable
+        );
+        
+        List<TaskResponse> content = taskPage.getContent().stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+        
+        return new PageResponse<>(
+                content,
+                taskPage.getNumber(),
+                taskPage.getSize(),
+                taskPage.getTotalElements(),
+                taskPage.getTotalPages(),
+                taskPage.isFirst(),
+                taskPage.isLast()
+        );
     }
     
     public TaskResponse getTaskById(Long id) {

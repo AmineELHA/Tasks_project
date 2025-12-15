@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { projectsAPI, tasksAPI } from '../api';
 import Navbar from '../components/Navbar';
 import ProgressBar from '../components/ProgressBar';
 import TaskItem from '../components/TaskItem';
 import TaskForm from '../components/TaskForm';
+import Pagination from '../components/Pagination';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Skeleton } from '../components/ui/skeleton';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -21,20 +24,30 @@ const ProjectDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showTaskForm, setShowTaskForm] = useState(false);
+  
+  // Pagination and filter states
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [completedFilter, setCompletedFilter] = useState('all'); // 'all', 'completed', 'pending'
+  const [sortBy, setSortBy] = useState('createdAt'); // 'createdAt', 'dueDate', 'title'
+  const [sortDirection, setSortDirection] = useState('desc'); // 'asc', 'desc'
 
   useEffect(() => {
     fetchProjectData();
   }, [id]);
 
+  useEffect(() => {
+    fetchTasks();
+  }, [id, currentPage, searchTerm, completedFilter, sortBy, sortDirection]);
+
   const fetchProjectData = async () => {
     try {
-      const [projectData, tasksData, progressData] = await Promise.all([
+      const [projectData, progressData] = await Promise.all([
         projectsAPI.getById(id),
-        tasksAPI.getByProject(id),
         projectsAPI.getProgress(id),
       ]);
       setProject(projectData);
-      setTasks(tasksData);
       setProgress(progressData);
       setError('');
     } catch (err) {
@@ -44,13 +57,32 @@ const ProjectDetails = () => {
     }
   };
 
+  const fetchTasks = async () => {
+    try {
+      const completed = completedFilter === 'all' ? null : completedFilter === 'completed';
+      const response = await tasksAPI.getFiltered(id, {
+        search: searchTerm,
+        completed,
+        sortBy,
+        sortDirection,
+        page: currentPage,
+        size: 10,
+      });
+      setTasks(response.content);
+      setTotalPages(response.totalPages);
+    } catch (err) {
+      console.error('Failed to load tasks:', err);
+      toast.error('Failed to load tasks');
+    }
+  };
+
   const handleCreateTask = async (taskData) => {
     try {
-      const newTask = await tasksAPI.create(taskData);
-      setTasks([...tasks, newTask]);
+      await tasksAPI.create(taskData);
       setShowTaskForm(false);
       toast.success('Task created successfully');
-      // Refresh progress
+      // Refresh tasks and progress
+      await fetchTasks();
       const progressData = await projectsAPI.getProgress(id);
       setProgress(progressData);
     } catch (err) {
@@ -60,9 +92,9 @@ const ProjectDetails = () => {
 
   const handleUpdateTask = async (taskId, taskData) => {
     try {
-      const updatedTask = await tasksAPI.update(taskId, taskData);
-      setTasks(tasks.map(t => t.id === taskId ? updatedTask : t));
-      // Refresh progress
+      await tasksAPI.update(taskId, taskData);
+      // Refresh tasks and progress
+      await fetchTasks();
       const progressData = await projectsAPI.getProgress(id);
       setProgress(progressData);
     } catch (err) {
@@ -73,13 +105,30 @@ const ProjectDetails = () => {
   const handleDeleteTask = async (taskId) => {
     try {
       await tasksAPI.delete(taskId);
-      setTasks(tasks.filter(t => t.id !== taskId));
-      // Refresh progress
+      // Refresh tasks and progress
+      await fetchTasks();
       const progressData = await projectsAPI.getProgress(id);
       setProgress(progressData);
     } catch (err) {
       throw err;
     }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(0); // Reset to first page on search
+  };
+
+  const handleFilterChange = (e) => {
+    setCompletedFilter(e.target.value);
+    setCurrentPage(0); // Reset to first page on filter change
+  };
+
+  const handleSortChange = (e) => {
+    const [field, direction] = e.target.value.split('-');
+    setSortBy(field);
+    setSortDirection(direction);
+    setCurrentPage(0); // Reset to first page on sort change
   };
 
   if (loading) {
@@ -182,28 +231,101 @@ const ProjectDetails = () => {
               />
             </div>
           )}
+
+          {/* Search and Filter Controls */}
+          <Card className="mb-6">
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Search */}
+                <div className="space-y-2">
+                  <Label htmlFor="search">Search</Label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="search"
+                      type="text"
+                      placeholder="Search tasks..."
+                      value={searchTerm}
+                      onChange={handleSearchChange}
+                      className="pl-9"
+                    />
+                  </div>
+                </div>
+
+                {/* Status Filter */}
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <select
+                    id="status"
+                    value={completedFilter}
+                    onChange={handleFilterChange}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value="all">All Tasks</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </div>
+
+                {/* Sort */}
+                <div className="space-y-2">
+                  <Label htmlFor="sort">Sort By</Label>
+                  <select
+                    id="sort"
+                    value={`${sortBy}-${sortDirection}`}
+                    onChange={handleSortChange}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value="createdAt-desc">Newest First</option>
+                    <option value="createdAt-asc">Oldest First</option>
+                    <option value="dueDate-asc">Due Date (Earliest)</option>
+                    <option value="dueDate-desc">Due Date (Latest)</option>
+                    <option value="title-asc">Title (A-Z)</option>
+                    <option value="title-desc">Title (Z-A)</option>
+                  </select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="space-y-3">
           {tasks.length === 0 ? (
             <Card className="border-dashed">
               <CardContent className="flex flex-col items-center py-16">
-                <p className="text-sm text-muted-foreground mb-4">No tasks yet</p>
-                <Button onClick={() => setShowTaskForm(true)} variant="outline">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Task
-                </Button>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {searchTerm || completedFilter !== 'all' 
+                    ? 'No tasks match your filters' 
+                    : 'No tasks yet'}
+                </p>
+                {!searchTerm && completedFilter === 'all' && (
+                  <Button onClick={() => setShowTaskForm(true)} variant="outline">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Task
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ) : (
-            tasks.map((task) => (
-              <TaskItem
-                key={task.id}
-                task={task}
-                onUpdate={handleUpdateTask}
-                onDelete={handleDeleteTask}
-              />
-            ))
+            <>
+              {tasks.map((task) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  onUpdate={handleUpdateTask}
+                  onDelete={handleDeleteTask}
+                />
+              ))}
+              {totalPages > 1 && (
+                <div className="mt-6">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

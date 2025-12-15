@@ -20,6 +20,13 @@ export const projectsAPI = {
     return response.data;
   },
 
+  getPaginated: async (page = 0, size = 10, sortBy = 'id', sortDirection = 'asc') => {
+    const response = await api.get('/projects/paginated', {
+      params: { page, size, sortBy, sortDirection }
+    });
+    return response.data;
+  },
+
   getById: async (id) => {
     const response = await api.get(`/projects/${id}`);
     return response.data;
@@ -49,6 +56,21 @@ export const projectsAPI = {
 export const tasksAPI = {
   getByProject: async (projectId) => {
     const response = await api.get(`/tasks?projectId=${projectId}`);
+    return response.data;
+  },
+
+  getFiltered: async (projectId, filters = {}) => {
+    const response = await api.get('/tasks/filter', {
+      params: {
+        projectId,
+        search: filters.search || null,
+        completed: filters.completed !== undefined ? filters.completed : null,
+        sortBy: filters.sortBy || 'id',
+        sortDirection: filters.sortDirection || 'asc',
+        page: filters.page || 0,
+        size: filters.size || 10
+      }
+    });
     return response.data;
   },
 
