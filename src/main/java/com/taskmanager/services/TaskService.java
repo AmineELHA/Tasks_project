@@ -69,12 +69,19 @@ public class TaskService {
         
         Pageable pageable = PageRequest.of(filterRequest.getPage(), filterRequest.getSize(), sort);
         
-        Page<Task> taskPage = taskRepository.findByFilters(
-                filterRequest.getProjectId(),
-                filterRequest.getSearch(),
-                filterRequest.getCompleted(),
-                pageable
-        );
+        Page<Task> taskPage;
+        
+        // Use simple query if no filters, otherwise use custom query
+        if (filterRequest.getSearch() == null && filterRequest.getCompleted() == null) {
+            taskPage = taskRepository.findByProjectId(filterRequest.getProjectId(), pageable);
+        } else {
+            taskPage = taskRepository.findByFilters(
+                    filterRequest.getProjectId(),
+                    filterRequest.getSearch(),
+                    filterRequest.getCompleted(),
+                    pageable
+            );
+        }
         
         List<TaskResponse> content = taskPage.getContent().stream()
                 .map(this::convertToResponse)

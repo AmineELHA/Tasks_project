@@ -60,17 +60,23 @@ export const tasksAPI = {
   },
 
   getFiltered: async (projectId, filters = {}) => {
-    const response = await api.get('/tasks/filter', {
-      params: {
-        projectId,
-        search: filters.search || null,
-        completed: filters.completed !== undefined ? filters.completed : null,
-        sortBy: filters.sortBy || 'id',
-        sortDirection: filters.sortDirection || 'asc',
-        page: filters.page || 0,
-        size: filters.size || 10
-      }
-    });
+    const params = {
+      projectId,
+      sortBy: filters.sortBy || 'id',
+      sortDirection: filters.sortDirection || 'asc',
+      page: filters.page || 0,
+      size: filters.size || 10
+    };
+    
+    // Only add optional params if they have values
+    if (filters.search) {
+      params.search = filters.search;
+    }
+    if (filters.completed !== undefined && filters.completed !== null) {
+      params.completed = filters.completed;
+    }
+    
+    const response = await api.get('/tasks/filter', { params });
     return response.data;
   },
 

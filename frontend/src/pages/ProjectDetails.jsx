@@ -62,18 +62,23 @@ const ProjectDetails = () => {
     
     try {
       const completed = completedFilter === 'all' ? null : completedFilter === 'completed';
-      const response = await tasksAPI.getFiltered(id, {
+      const filters = {
         search: searchTerm,
         completed,
         sortBy,
         sortDirection,
         page: currentPage,
         size: 10,
-      });
+      };
+      console.log('Fetching tasks with filters:', filters);
+      const response = await tasksAPI.getFiltered(id, filters);
+      console.log('Tasks loaded successfully:', response);
       setTasks(response.content);
       setTotalPages(response.totalPages);
     } catch (err) {
       console.error('Failed to load tasks:', err);
+      console.error('Error response:', err.response?.data);
+      console.error('Error status:', err.response?.status);
       // Don't show error toast on initial load if it's just an empty result
       if (err.response && err.response.status !== 404) {
         toast.error('Failed to load tasks');
