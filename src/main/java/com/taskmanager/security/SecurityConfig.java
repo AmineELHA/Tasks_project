@@ -14,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -47,9 +49,18 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.disable())
+            .cors(cors -> cors.configurationSource(request -> {
+                CorsConfiguration config = new CorsConfiguration();
+                String frontendUrl = System.getenv().getOrDefault("FRONTEND_URL", "http://localhost:3000");
+                config.setAllowedOrigins(Arrays.asList(frontendUrl, "http://localhost:3000"));
+                config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedHeaders(Arrays.asList("*"));
+                config.setAllowCredentials(true);
+                config.setMaxAge(3600L);
+                return config;
+            }))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/login", "/auth/register").permitAll()
+                .requestMatchers("/auth/login", "/auth/register", "/actuator/health").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

@@ -48,6 +48,14 @@ frontend/.env
 
 ### Environment Variables ###
 .env
+.env.local
+.env.production.local
+.env.*.local
+
+### Production Secrets ###
+# Keep templates, but ignore actual production configs with secrets
+*.secret
+secrets/
 
 ### Temp files ###
 opencodetmp/
