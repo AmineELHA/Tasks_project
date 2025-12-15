@@ -30,7 +30,7 @@ const ProjectDetails = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [completedFilter, setCompletedFilter] = useState('all'); // 'all', 'completed', 'pending'
-  const [sortBy, setSortBy] = useState('createdAt'); // 'createdAt', 'dueDate', 'title'
+  const [sortBy, setSortBy] = useState('id'); // 'id', 'dueDate', 'title'
   const [sortDirection, setSortDirection] = useState('desc'); // 'asc', 'desc'
 
   useEffect(() => {
@@ -58,6 +58,8 @@ const ProjectDetails = () => {
   };
 
   const fetchTasks = async () => {
+    if (!id) return; // Don't fetch if no project ID
+    
     try {
       const completed = completedFilter === 'all' ? null : completedFilter === 'completed';
       const response = await tasksAPI.getFiltered(id, {
@@ -72,7 +74,10 @@ const ProjectDetails = () => {
       setTotalPages(response.totalPages);
     } catch (err) {
       console.error('Failed to load tasks:', err);
-      toast.error('Failed to load tasks');
+      // Don't show error toast on initial load if it's just an empty result
+      if (err.response && err.response.status !== 404) {
+        toast.error('Failed to load tasks');
+      }
     }
   };
 
@@ -276,8 +281,8 @@ const ProjectDetails = () => {
                     onChange={handleSortChange}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
-                    <option value="createdAt-desc">Newest First</option>
-                    <option value="createdAt-asc">Oldest First</option>
+                    <option value="id-desc">Newest First</option>
+                    <option value="id-asc">Oldest First</option>
                     <option value="dueDate-asc">Due Date (Earliest)</option>
                     <option value="dueDate-desc">Due Date (Latest)</option>
                     <option value="title-asc">Title (A-Z)</option>
