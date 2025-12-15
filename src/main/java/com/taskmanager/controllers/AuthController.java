@@ -2,6 +2,7 @@ package com.taskmanager.controllers;
 
 import com.taskmanager.dtos.LoginRequest;
 import com.taskmanager.dtos.LoginResponse;
+import com.taskmanager.dtos.RegisterRequest;
 import com.taskmanager.services.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,12 @@ public class AuthController {
     
     @Autowired
     private AuthService authService;
+    
+    @PostMapping("/register")
+    public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
+        LoginResponse response = authService.register(registerRequest);
+        return ResponseEntity.ok(response);
+    }
     
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {

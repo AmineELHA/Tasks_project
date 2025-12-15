@@ -8,20 +8,34 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
-const Login = () => {
+const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
 
-    const result = await login(email, password);
+    const result = await register(email, password);
 
     if (result.success) {
       navigate('/projects');
@@ -39,15 +53,15 @@ const Login = () => {
             Task Manager
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Sign in to your account
+            Create your account to get started
           </p>
         </div>
         
         <Card className="border-border">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl">Welcome back</CardTitle>
+            <CardTitle className="text-2xl">Create account</CardTitle>
             <CardDescription>
-              Enter your credentials to continue
+              Enter your details to create a new account
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -68,7 +82,7 @@ const Login = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@demo.com"
+                  placeholder="you@example.com"
                 />
               </div>
               
@@ -83,6 +97,22 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Must be at least 6 characters
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••"
+                />
               </div>
 
               <Button
@@ -90,23 +120,19 @@ const Login = () => {
                 disabled={loading}
                 className="w-full mt-6"
               >
-                {loading ? 'Signing in...' : 'Sign in'}
+                {loading ? 'Creating account...' : 'Create account'}
               </Button>
               
               <div className="text-center text-sm pt-4 border-t">
-                <p className="text-muted-foreground mb-3">
-                  Don't have an account?{' '}
+                <p className="text-muted-foreground">
+                  Already have an account?{' '}
                   <Link 
-                    to="/register" 
+                    to="/login" 
                     className="font-medium text-primary hover:underline"
                   >
-                    Create account
+                    Sign in
                   </Link>
                 </p>
-                <div className="text-xs text-muted-foreground">
-                  <p className="mb-1">Demo credentials:</p>
-                  <p className="font-mono">admin@demo.com / 123456</p>
-                </div>
               </div>
             </form>
           </CardContent>
@@ -116,4 +142,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

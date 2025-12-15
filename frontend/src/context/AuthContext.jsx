@@ -18,6 +18,23 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  const register = async (email, password) => {
+    try {
+      const data = await authAPI.register(email, password);
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('email', data.email);
+      setUser({ email: data.email });
+      return { success: true };
+    } catch (error) {
+      console.error('Registration error:', error);
+      console.error('Error response:', error.response);
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message || 'Registration failed',
+      };
+    }
+  };
+
   const login = async (email, password) => {
     try {
       const data = await authAPI.login(email, password);
@@ -41,6 +58,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    register,
     login,
     logout,
     isAuthenticated: !!user,

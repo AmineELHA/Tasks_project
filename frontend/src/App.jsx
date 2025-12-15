@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import Home from './pages/Home';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import ProjectList from './pages/ProjectList';
 import ProjectDetails from './pages/ProjectDetails';
 import NewProject from './pages/NewProject';
@@ -17,8 +19,19 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-// Public Route Component (redirect to /projects if already logged in)
-function PublicRoute({ children }) {
+// Public Route Component for Auth pages (redirect to /projects if already logged in)
+function AuthRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  
+  if (isAuthenticated) {
+    return <Navigate to="/projects" replace />;
+  }
+  
+  return children;
+}
+
+// Home Route Component (redirect to /projects if already logged in)
+function HomeRoute({ children }) {
   const { isAuthenticated } = useAuth();
   
   if (isAuthenticated) {
@@ -31,13 +44,31 @@ function PublicRoute({ children }) {
 function AppRoutes() {
   return (
     <Routes>
-      {/* Public Routes */}
+      {/* Home Route */}
+      <Route 
+        path="/" 
+        element={
+          <HomeRoute>
+            <Home />
+          </HomeRoute>
+        } 
+      />
+      
+      {/* Public Auth Routes */}
       <Route 
         path="/login" 
         element={
-          <PublicRoute>
+          <AuthRoute>
             <Login />
-          </PublicRoute>
+          </AuthRoute>
+        } 
+      />
+      <Route 
+        path="/register" 
+        element={
+          <AuthRoute>
+            <Register />
+          </AuthRoute>
         } 
       />
       
@@ -67,9 +98,8 @@ function AppRoutes() {
         } 
       />
       
-      {/* Default redirect */}
-      <Route path="/" element={<Navigate to="/projects" replace />} />
-      <Route path="*" element={<Navigate to="/projects" replace />} />
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

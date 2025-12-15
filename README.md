@@ -278,7 +278,7 @@ This project is created as part of a technical assessment.
 
 ## 👤 Author
 
-**Amine EL HARCHAOUI**
+**Amine EL Hammouti**
 - GitHub: [@AmineELHA](https://github.com/AmineELHA)
 - Repository: [Tasks_project](https://github.com/AmineELHA/Tasks_project)
 
